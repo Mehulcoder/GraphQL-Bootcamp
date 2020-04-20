@@ -28,11 +28,20 @@ var posts = [{
     author: '2'
 }]
 
+//Comments Array
+var comments = [{
+    id:'21',
+    text:'Hello ji this is by Mehull on Post2',
+    author:'1',
+    post:'11'
+}]
+
 //Type definition (schema)
 const typeDefs = `
     type Query {
         users(query: String): [User!]!
         posts(query: String): [Post!]!
+        comments: [Comment!]!
         me: User!
         post: Post!
     }
@@ -42,6 +51,8 @@ const typeDefs = `
         name: String!
         age: Int
         email: String!
+        posts: [Post!]!
+        comments: [Comment!]!
     }
 
     type Post{
@@ -50,6 +61,14 @@ const typeDefs = `
         body:String!
         published: Boolean!
         author: User!
+        comments: [Comment!]!
+    }
+
+    type Comment{
+        id:ID!
+        text: String!
+        author: User!
+        post: Post!
     }
 
 ` 
@@ -75,8 +94,7 @@ const resolvers = {
 
             return users.filter((user) => {
                 return user.name.toLowerCase().includes(args.query.toLowerCase());
-            }
-            )
+            })
         },
 
         me(){
@@ -94,9 +112,37 @@ const resolvers = {
                 body: "Hello this is my body",
                 published: false
             }
+        },
+
+        comments(){
+            return comments;
         }
     },
     Post:{
+        author(parent, args, ctx, info){
+            return users.find((user) => {
+                return user.id === parent.author;
+            })
+        },
+        comments(parent, args, ctx, info){
+            return comments.filter((comment) => {
+                return  comment.post === parent.id;
+            })
+        }
+    },
+    User:{
+        posts(parent, args, ctx, info){
+            return posts.filter((post) => {
+                return parent.id === post.author;
+            })
+        },
+        comments(parent,args,ctx,info){
+            return comments.filter((comment) => {
+                return comment.author === parent.id;
+            })
+        }
+    },
+    Comment:{
         author(parent, args, ctx, info){
             return users.find((user) => {
                 return user.id === parent.author;
