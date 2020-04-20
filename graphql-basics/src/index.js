@@ -15,15 +15,17 @@ var users = [{
 
 //Demo posts data
 var posts = [{
-    id:'1',
+    id:'10',
     title:"Post1",
     body: "Hello this is the post 1",
-    published: 0
+    published: 0,
+    author: '1'
 },{
-    id:'2',
+    id:'11',
     title:"Post2",
     body: "Hello this is the post 2",
-    published: 0
+    published: 0,
+    author: '2'
 }]
 
 //Type definition (schema)
@@ -47,6 +49,7 @@ const typeDefs = `
         title: String!
         body:String!
         published: Boolean!
+        author: User!
     }
 
 ` 
@@ -91,6 +94,13 @@ const resolvers = {
                 body: "Hello this is my body",
                 published: false
             }
+        }
+    },
+    Post:{
+        author(parent, args, ctx, info){
+            return users.find((user) => {
+                return user.id === parent.author;
+            })
         }
     }
 }
