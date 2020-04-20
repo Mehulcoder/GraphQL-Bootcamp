@@ -147,6 +147,11 @@ const resolvers = {
             return users.find((user) => {
                 return user.id === parent.author;
             })
+        },
+        post(parent, args, ctx, info){
+            return posts.find((pos) => {
+                return parent.post === pos.id;
+            })
         }
     }
 }
