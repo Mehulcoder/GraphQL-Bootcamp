@@ -51,6 +51,8 @@ const typeDefs = `
         createUser(data: CreateUserInput!): User!
         createPost(data:CreatePostInput!): Post!
         createComment(data: CreateCommentInput!): Comment!
+        deleteUser(id:ID!): User!
+        deletePost(id:ID!): Post!
     }
 
     input CreateUserInput{
@@ -161,6 +163,35 @@ const resolvers = {
 
             users.push(user);
             return user;
+        }, 
+
+        deleteUser(parent, args, ctx, info){
+            var userIndex = users.findIndex((user) => {
+                return args.id === user.id;
+            })
+
+            if(userIndex === -1){
+                throw new Error("User has not been found!");
+            }
+
+            posts = posts.filter((post) => {
+                var match = post.author === args.id;
+
+                if(match){
+                    comments = comments.filter((comment) => {
+                        return comment.post !== post.id
+                    })
+                }
+
+                return !match;
+            })
+
+            comments = comments.filter((comment) => {
+                comment.author != args.id;
+            })
+
+            var deletedUsers = users.splice(userIndex, 1);
+            return deletedUsers[0];
         },
 
         createPost(parent, args, ctx, info){
@@ -184,6 +215,26 @@ const resolvers = {
 
             return post;
         },
+
+        deletePost(parent, args, ctx, info){
+            var postIndex = posts.findIndex((post) => {
+                return post.id === args.id;
+            });
+
+            if (postIndex===-1) {
+                throw new Error("Could not find the post!");
+            }
+
+            var deletedPost = posts.splice(postIndex,1);
+            
+            comments = comments.filter((comment) => {
+                return comment.post !== args.id;
+            })
+
+            return deletedPost[0];
+
+        },
+
         createComment(parent, args, ctx, info){
             var userExist = users.some((user) => {
                 return user.id===args.data.author
