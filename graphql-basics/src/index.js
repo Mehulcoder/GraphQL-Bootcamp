@@ -48,9 +48,29 @@ const typeDefs = `
     }
 
     type Mutation{
-        createUser(name: String!, email: String!, age:Int): User!
-        createPost(title: String!, body:String!, published: Boolean!, author: ID!): Post!
-        createComment(text: String!, author: ID!, post: ID!): Comment!
+        createUser(data: CreateUserInput!): User!
+        createPost(data:CreatePostInput!): Post!
+        createComment(data: CreateCommentInput!): Comment!
+    }
+
+    input CreateUserInput{
+        name: String!, 
+        email: String!, 
+        age:Int
+    }
+
+    input CreatePostInput{
+        title: String!, 
+        body:String!, 
+        published: 
+        Boolean!, 
+        author: ID!
+    }
+
+    input CreateCommentInput{
+        text: String!, 
+        author: ID!, 
+        post: ID!
     }
 
     type User{
@@ -128,7 +148,7 @@ const resolvers = {
     Mutation:{
         createUser(parent, args, ctx, info){
             var emailTaken = users.some((user) => {
-                return user.email === args.email;
+                return user.email === args.data.email;
             })
             if(emailTaken){
                 throw new Error("Email has already been taken");
@@ -136,7 +156,7 @@ const resolvers = {
 
             var user = {
                 id: uuidv4(),
-                ...args
+                ...args.data
             }
 
             users.push(user);
@@ -146,12 +166,12 @@ const resolvers = {
         createPost(parent, args, ctx, info){
             var userExist = users.some((user) => {
                 // console.log(user.id, args.author);  
-                return user.id === args.author;
+                return user.id === args.data.author;
             })
 
             var post = {
                 id: uuidv4,
-                ...args
+                ...args.data
             }
 
             if (!userExist) {
@@ -166,16 +186,16 @@ const resolvers = {
         },
         createComment(parent, args, ctx, info){
             var userExist = users.some((user) => {
-                return user.id===args.author
+                return user.id===args.data.author
             })
 
             var postExist = posts.some((post) => {
-                return post.id === args.post && post.published;
+                return post.id === args.data.post && post.published;
             })
 
             var comment = {
                 id: uuidv4,
-                ...args
+                ...args.data
 
             }
 
