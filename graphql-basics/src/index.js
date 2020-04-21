@@ -53,6 +53,7 @@ const typeDefs = `
         createComment(data: CreateCommentInput!): Comment!
         deleteUser(id:ID!): User!
         deletePost(id:ID!): Post!
+        deleteComment(id:ID!):Comment!
     }
 
     input CreateUserInput{
@@ -260,6 +261,19 @@ const resolvers = {
             }
 
             return comment;
+        },
+
+        deleteComment(parent, args, ctx, info){
+            var commentIndex = comments.findIndex((comment) => {
+                return comment.id === args.id;
+            })
+
+            if (commentIndex===-1) {
+                throw new Error("Comment not found");
+            }
+
+            var deletedComment = comments.splice(commentIndex,1);
+            return deletedComment[0];
         }
     },
     Post:{
