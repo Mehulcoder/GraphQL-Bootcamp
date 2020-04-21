@@ -19,13 +19,13 @@ var posts = [{
     id:'10',
     title:"Post1",
     body: "Hello this is the post 1",
-    published: 0,
+    published: 1,
     author: '1'
 },{
     id:'11',
     title:"Post2",
     body: "Hello this is the post 2",
-    published: 0,
+    published: 1,
     author: '2'
 }]
 
@@ -136,9 +136,7 @@ const resolvers = {
 
             var user = {
                 id: uuidv4(),
-                name: args.name,
-                email: args.email,
-                age:args.age
+                ...args
             }
 
             users.push(user);
@@ -153,10 +151,7 @@ const resolvers = {
 
             var post = {
                 id: uuidv4,
-                title: args.title,
-                body: args.body,
-                author: args.author,
-                published:args.published
+                ...args
             }
 
             if (!userExist) {
@@ -177,15 +172,15 @@ const resolvers = {
             var postExist = posts.some((post) => {
                 return post.id === args.post && post.published;
             })
-            
+
             var comment = {
                 id: uuidv4,
-                text: args.text,
-                author: args.author,
-                post: args.post
+                ...args
+
             }
 
             if (!userExist || !postExist ) {
+                console.log(userExist , postExist);
                 throw new Error("Unable to find user and post!")
             }
 
