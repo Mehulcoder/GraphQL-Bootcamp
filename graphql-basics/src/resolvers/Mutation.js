@@ -10,13 +10,44 @@ var Mutation = {
         }
 
         var user = {
-            id: uuidv4(),
+            id: uuidv4().toString(),
             ...args.data
         }
 
         db.users.push(user);
         return user;
-    }, 
+    },
+
+    updateUser(parent, {id, data}, {db}, info){
+        var user = db.users.find((user) => {
+            return user.id === id;
+        });
+
+        if (!user) {
+            throw new Error("User not found!");
+        }
+
+        if (typeof data.email === 'string') {
+            const emailTaken = db.users.some((user) => {
+                return user.email === data.email;
+            })
+            if (emailTaken) {
+                throw new Error("Email already in use")
+            }
+
+            user.email = data.email;            
+
+        }
+        if (typeof data.name === 'string') {
+            user.name = data.name;
+        }
+
+        if (data.age !== undefined) {
+            user.age = data.age;
+        }
+
+        return user;
+    },
 
     deleteUser(parent, args, {db}, info){
         var userIndex = db.users.findIndex((user) => {
@@ -54,7 +85,7 @@ var Mutation = {
         })
 
         var post = {
-            id: uuidv4,
+            id: uuidv4().toString(),
             ...args.data
         }
 
@@ -67,6 +98,30 @@ var Mutation = {
         }
 
         return post;
+    },
+
+    updatePost(parent, {id, data}, {db}, info){
+        var postExist = db.posts.find((post) => {
+            // console.log(post.id)
+            return post.id === id;
+        })
+
+        if (!postExist) {
+            throw new Error("Post not found!");
+        }
+
+        if (typeof data.title === "string") {
+            postExist.title = data.title;
+        }
+        if (typeof data.body === "string") {
+            postExist.body = data.body;
+        }
+
+        if (typeof data.published === "boolean") {
+            postExist.published = data.published;
+        }
+
+        return postExist;
     },
 
     deletePost(parent, args, {db}, info){
@@ -98,7 +153,7 @@ var Mutation = {
         })
 
         var comment = {
-            id: uuidv4,
+            id: uuidv4().toString(),
             ...args.data
 
         }

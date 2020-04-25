@@ -22,24 +22,24 @@ var Query = {
         })
     },
 
-    me(){
-        return {
-            id: 'Mehul128',
-            name: "Mehul",
-            age: 28
-        }
-    },
+    // me(){
+    //     return {
+    //         id: 'Mehul128',
+    //         name: "Mehul",
+    //         age: 28
+    //     }
+    // },
 
-    post(){
-        return {
-            id:'12345',
-            title: "Hello this is GraphQL",
-            body: "Hello this is my body",
-            published: false
-        }
-    },
+    // post(){
+    //     return {
+    //         id:'12345',
+    //         title: "Hello this is GraphQL",
+    //         body: "Hello this is my body",
+    //         published: false
+    //     }
+    // },
 
-    comments(){
+    comments(parent, args, ctx, info){
         return db.comments;
     }
 }
