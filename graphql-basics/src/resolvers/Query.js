@@ -1,3 +1,4 @@
+import db from '../db'
 
 var Query = {
     posts(parent, args, {db}, info){
