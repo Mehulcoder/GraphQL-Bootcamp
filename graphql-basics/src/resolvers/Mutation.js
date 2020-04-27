@@ -46,6 +46,7 @@ var Mutation = {
             user.age = data.age;
         }
 
+
         return user;
     },
 
@@ -97,13 +98,18 @@ var Mutation = {
             db.posts.push(post);
         }
         if (post.published) {
-            pubsub.publish(`post`,{post});
+            pubsub.publish(`post`,{
+                post:{
+                    mutation:"CREATED",
+                    data:post
+                }
+            });
         }
 
         return post;
     },
 
-    updatePost(parent, {id, data}, {db}, info){
+    updatePost(parent, {id, data}, {db,pubsub}, info){
         var postExist = db.posts.find((post) => {
             // console.log(post.id)
             return post.id === id;
@@ -124,10 +130,17 @@ var Mutation = {
             postExist.published = data.published;
         }
 
+        pubsub.publish(`post`,{
+            post:{
+                mutation:"UPDATED",
+                data:postExist
+            }
+        });
+
         return postExist;
     },
 
-    deletePost(parent, args, {db}, info){
+    deletePost(parent, args, {db,pubsub}, info){
         var postIndex = db.posts.findIndex((post) => {
             return post.id === args.id;
         });
@@ -136,13 +149,23 @@ var Mutation = {
             throw new Error("Could not find the post!");
         }
 
-        var deletedPost = db.posts.splice(postIndex,1);
+        var [post] = db.posts.splice(postIndex,1);
         
         db.comments = db.comments.filter((comment) => {
             return comment.post !== args.id;
         })
 
-        return deletedPost[0];
+        if (post.published) {
+            pubsub.publish(`post`,{
+                post:{
+                    mutation:"DELETED",
+                    data:post
+                }
+            });
+        }
+        
+
+        return post;
 
     },
 
@@ -174,7 +197,7 @@ var Mutation = {
         return comment;
     },
 
-    deleteComment(parent, args, {db}, info){
+    deleteComment(parent, args, {pubsub,db}, info){
         var commentIndex = db.comments.findIndex((comment) => {
             return comment.id === args.id;
         })
@@ -184,6 +207,9 @@ var Mutation = {
         }
 
         var deletedComment = db.comments.splice(commentIndex,1);
+
+        pubsub.publish(`comment ${deletedComment[0].post}`, {comment: deletedComment[0]});
+
         return deletedComment[0];
     }
 }
